@@ -42,3 +42,13 @@ Dictionary content is derived from Wiktionary contributors via Kaikki.org/Wiktex
 ## Release
 
 Release signing and Google Play upload notes are in `docs/RELEASE.md`.
+
+## Web App
+
+The repository root contains a small Progressive Web App for GitHub Pages. It reuses the same bundled dictionary asset as the Android app.
+
+GitHub Pages URL:
+
+```text
+https://roccobb.github.io/6-July/
+```

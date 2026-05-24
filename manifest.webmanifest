@@ -1,0 +1,24 @@
+{
+  "name": "Finnish Word of the Day",
+  "short_name": "Finnish Word",
+  "description": "Learn one Finnish word every day, offline.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#f8fbf6",
+  "theme_color": "#f8fbf6",
+  "icons": [
+    {
+      "src": "web/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "web/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

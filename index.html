@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#f8fbf6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Finnish Word">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>Finnish Word of the Day</title>
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="apple-touch-icon" href="web/icons/icon-180.png">
+    <link rel="icon" sizes="192x192" href="web/icons/icon-192.png">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="app-header">
+        <p id="dateLabel" class="date-label"></p>
+        <h1>Finnish Word of the Day</h1>
+      </header>
+
+      <nav class="tabs" aria-label="Sections">
+        <button class="tab-button active" type="button" data-tab="today">Today</button>
+        <button class="tab-button" type="button" data-tab="favorites">Favorites</button>
+        <button class="tab-button" type="button" data-tab="about">About</button>
+      </nav>
+
+      <section id="todayPanel" class="panel active" aria-labelledby="todayTab">
+        <article id="dailyCard" class="word-card loading-card">
+          <p>Loading...</p>
+        </article>
+      </section>
+
+      <section id="favoritesPanel" class="panel" aria-labelledby="favoritesTab">
+        <div id="favoritesList" class="favorites-list"></div>
+      </section>
+
+      <section id="aboutPanel" class="panel" aria-labelledby="aboutTab">
+        <article class="info-card">
+          <h2>About</h2>
+          <p>Finnish Word of the Day is an offline vocabulary app by Valkotassu.</p>
+          <h3>Dictionary Data</h3>
+          <p>Definitions, pronunciations, and examples are derived from Wiktionary contributors via Kaikki.org/Wiktextract.</p>
+          <h3>Privacy</h3>
+          <p>The app does not collect personal data. Favorites are stored locally on this device.</p>
+          <a href="privacy.html">Privacy policy</a>
+        </article>
+      </section>
+    </main>
+
+    <script src="web/app.js" defer></script>
+  </body>
+</html>
