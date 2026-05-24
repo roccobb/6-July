@@ -1,4 +1,4 @@
-package com.example.finnishwordoftheday.ui.theme
+package com.valkotassu.finnishwordoftheday.ui.theme
 
 import android.app.Activity
 import android.os.Build

@@ -1,4 +1,4 @@
-package com.example.finnishwordoftheday
+package com.valkotassu.finnishwordoftheday
 
 import org.junit.Test
 

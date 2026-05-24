@@ -1,4 +1,4 @@
-package com.example.finnishwordoftheday
+package com.valkotassu.finnishwordoftheday
 
 import android.content.Context
 import android.content.Intent
@@ -43,7 +43,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.finnishwordoftheday.ui.theme.FinnishWordOfTheDayTheme
+import com.valkotassu.finnishwordoftheday.ui.theme.FinnishWordOfTheDayTheme
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -189,6 +189,8 @@ private fun WordOfTheDayScreen(
                         favoriteWords = favoriteWords,
                         onToggleFavorite = onToggleFavorite,
                     )
+
+                    AppTab.About -> AboutScreen()
                 }
             }
         }
@@ -469,6 +471,62 @@ private fun EmptyWordCard(errorMessage: String?, modifier: Modifier = Modifier) 
     }
 }
 
+@Composable
+private fun AboutScreen(modifier: Modifier = Modifier) {
+    LazyColumn(
+        modifier = modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(8.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.94f)
+                ),
+            ) {
+                Column(modifier = Modifier.padding(24.dp)) {
+                    Text(
+                        text = "About",
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        text = "Finnish Word of the Day is an offline vocabulary app by Valkotassu.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                    Spacer(modifier = Modifier.height(18.dp))
+                    Text(
+                        text = "Dictionary data",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Definitions, pronunciations, and examples are derived from Wiktionary contributors via Kaikki.org/Wiktextract. This app is not affiliated with or endorsed by those projects.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Spacer(modifier = Modifier.height(18.dp))
+                    Text(
+                        text = "Privacy",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "The app works offline and does not collect personal data. Favorites are stored locally on this device.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+        }
+    }
+}
+
 private data class DailyWord(
     val word: String,
     val partOfSpeech: String,
@@ -488,6 +546,7 @@ private data class Example(
 private enum class AppTab(val label: String) {
     Today("Today"),
     Favorites("Favorites"),
+    About("About"),
 }
 
 private const val FAVORITES_PREFS = "favorite_words"

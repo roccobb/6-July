@@ -1,0 +1,14 @@
+Finnish Word of the Day helps you discover one Finnish word each day with a clear English definition.
+
+The app works offline and keeps things simple: open it, read today's word, save favorites, and share words with friends.
+
+Features:
+- One Finnish word selected each day
+- English definitions
+- Optional pronunciation and example sentences when available
+- Favorites saved locally on your device
+- Share the daily word using Android's native share menu
+- No account required
+- No ads, analytics, or tracking
+
+Dictionary data is derived from Wiktionary contributors via Kaikki.org/Wiktextract. This app is not affiliated with, sponsored by, or endorsed by the Wikimedia Foundation, Wiktionary, Kaikki.org, or Wiktextract.

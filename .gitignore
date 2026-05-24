@@ -14,6 +14,11 @@
 .externalNativeBuild
 .cxx
 local.properties
+keystore.properties
+*.jks
+*.keystore
+__pycache__/
+*.pyc
 
 # Local source data from kaikki.org can be several GB. Keep generated app assets
 # under version control instead.
