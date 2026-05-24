@@ -2,6 +2,7 @@
 .gradle
 /local.properties
 /.idea/caches
+/.idea/
 /.idea/libraries
 /.idea/modules.xml
 /.idea/workspace.xml
@@ -13,3 +14,8 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Local source data from kaikki.org can be several GB. Keep generated app assets
+# under version control instead.
+/data/raw/
+/data/processed/
