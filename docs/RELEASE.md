@@ -55,6 +55,20 @@ The output should be:
 app/build/outputs/bundle/release/app-release.aab
 ```
 
+Release notes for version 1.2:
+
+```text
+<en-US>
+Added a home screen widget for today's Finnish word.
+
+Includes:
+- View today's word and definition from the home screen
+- Share today's word directly from the widget
+- Add or remove today's word from favorites directly from the widget
+- Small usability improvements based on tester feedback
+</en-US>
+```
+
 ## 5. Play Console Store Listing
 
 Prepare:

@@ -33,7 +33,8 @@ a {
 }
 
 .app-shell {
-  width: min(100%, 720px);
+  width: 100%;
+  max-width: 720px;
   min-height: 100vh;
   margin: 0 auto;
   padding: calc(20px + env(safe-area-inset-top)) 20px calc(24px + env(safe-area-inset-bottom));
@@ -165,6 +166,23 @@ h1 {
 .icon-button.active {
   background: var(--primary-soft);
   color: var(--primary);
+}
+
+.share-icon {
+  width: 24px;
+  height: 24px;
+  display: block;
+}
+
+.share-icon circle {
+  fill: currentColor;
+}
+
+.share-icon-line {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-width: 1.8;
 }
 
 .ipa {

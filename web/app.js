@@ -5,7 +5,7 @@ const state = {
   words: [],
   dailyWord: null,
   favorites: new Set(),
-  selectedTab: "today",
+  selectedTab: tabFromHash(),
 };
 
 const elements = {
@@ -46,6 +46,7 @@ function bindTabs() {
   elements.tabButtons.forEach((button) => {
     button.addEventListener("click", () => {
       state.selectedTab = button.dataset.tab;
+      history.replaceState(null, "", `#${state.selectedTab}`);
       renderTabs();
     });
   });
@@ -84,7 +85,7 @@ function renderDailyWord() {
         <button class="icon-button ${isFavorite ? "active" : ""}" type="button" data-action="favorite" aria-label="${isFavorite ? "Remove favorite" : "Add favorite"}">
           ${isFavorite ? "★" : "☆"}
         </button>
-        <button class="icon-button" type="button" data-action="share" aria-label="Share word">↗</button>
+        <button class="icon-button" type="button" data-action="share" aria-label="Share word">${shareIconMarkup()}</button>
       </div>
     </div>
     ${word.ipa ? `<p class="ipa">${escapeHtml(word.ipa)}</p>` : ""}
@@ -219,6 +220,17 @@ function shareText(word) {
   return lines.join("\n");
 }
 
+function shareIconMarkup() {
+  return `
+    <svg class="share-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path class="share-icon-line" d="M8 12 L18 6 M8 12 L18 18"></path>
+      <circle cx="8" cy="12" r="3.2"></circle>
+      <circle cx="18" cy="6" r="3.2"></circle>
+      <circle cx="18" cy="18" r="3.2"></circle>
+    </svg>
+  `;
+}
+
 function escapeHtml(value) {
   return String(value)
     .replaceAll("&", "&amp;")
@@ -232,4 +244,9 @@ function registerServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("service-worker.js");
   }
+}
+
+function tabFromHash() {
+  const tab = window.location.hash.replace("#", "");
+  return ["today", "favorites", "about"].includes(tab) ? tab : "today";
 }

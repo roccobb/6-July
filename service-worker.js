@@ -1,4 +1,4 @@
-const CACHE_NAME = "finnish-word-v1";
+const CACHE_NAME = "finnish-word-v2";
 const APP_SHELL = [
   ".",
   "index.html",

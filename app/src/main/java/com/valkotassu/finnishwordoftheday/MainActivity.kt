@@ -1,12 +1,12 @@
 package com.valkotassu.finnishwordoftheday
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +19,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -35,20 +37,20 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.valkotassu.finnishwordoftheday.ui.theme.FinnishWordOfTheDayTheme
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
 import kotlinx.coroutines.delay
-import org.json.JSONArray
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -109,6 +111,7 @@ private fun WordOfTheDayRoute(modifier: Modifier = Modifier) {
 }
 
 @Composable
+@OptIn(ExperimentalFoundationApi::class)
 private fun WordOfTheDayScreen(
     dailyWord: DailyWord?,
     favoriteWords: List<DailyWord>,
@@ -121,6 +124,24 @@ private fun WordOfTheDayScreen(
     onShareWord: (DailyWord) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val tabs = AppTab.values()
+    val pagerState = rememberPagerState(
+        initialPage = selectedTab.ordinal,
+        pageCount = { tabs.size },
+    )
+
+    LaunchedEffect(selectedTab) {
+        if (pagerState.currentPage != selectedTab.ordinal) {
+            pagerState.animateScrollToPage(selectedTab.ordinal)
+        }
+    }
+
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.currentPage }
+            .distinctUntilChanged()
+            .collect { page -> onTabSelected(tabs[page]) }
+    }
+
     Surface(modifier = modifier, color = MaterialTheme.colorScheme.background) {
         Box(
             modifier = Modifier
@@ -153,11 +174,11 @@ private fun WordOfTheDayScreen(
                 Spacer(modifier = Modifier.height(22.dp))
 
                 TabRow(
-                    selectedTabIndex = selectedTab.ordinal,
+                    selectedTabIndex = pagerState.currentPage,
                     containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.82f),
                     contentColor = MaterialTheme.colorScheme.primary,
                 ) {
-                    AppTab.values().forEach { tab ->
+                    tabs.forEach { tab ->
                         Tab(
                             selected = selectedTab == tab,
                             onClick = { onTabSelected(tab) },
@@ -168,29 +189,35 @@ private fun WordOfTheDayScreen(
 
                 Spacer(modifier = Modifier.height(22.dp))
 
-                when (selectedTab) {
-                    AppTab.Today -> Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        if (dailyWord == null) {
-                            EmptyWordCard(errorMessage = errorMessage)
-                        } else {
-                            DailyWordCard(
-                                dailyWord = dailyWord,
-                                isFavorite = isDailyWordFavorite,
-                                onToggleFavorite = { onToggleFavorite(dailyWord) },
-                                onShareWord = { onShareWord(dailyWord) },
-                            )
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier.fillMaxSize(),
+                    verticalAlignment = Alignment.Top,
+                ) { page ->
+                    when (tabs[page]) {
+                        AppTab.Today -> Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            if (dailyWord == null) {
+                                EmptyWordCard(errorMessage = errorMessage)
+                            } else {
+                                DailyWordCard(
+                                    dailyWord = dailyWord,
+                                    isFavorite = isDailyWordFavorite,
+                                    onToggleFavorite = { onToggleFavorite(dailyWord) },
+                                    onShareWord = { onShareWord(dailyWord) },
+                                )
+                            }
                         }
+
+                        AppTab.Favorites -> FavoriteWordsList(
+                            favoriteWords = favoriteWords,
+                            onToggleFavorite = onToggleFavorite,
+                        )
+
+                        AppTab.About -> AboutScreen()
                     }
-
-                    AppTab.Favorites -> FavoriteWordsList(
-                        favoriteWords = favoriteWords,
-                        onToggleFavorite = onToggleFavorite,
-                    )
-
-                    AppTab.About -> AboutScreen()
                 }
             }
         }
@@ -301,22 +328,13 @@ private fun DailyWordCard(
 private fun FavoriteButton(isFavorite: Boolean, onClick: () -> Unit) {
     IconButton(
         onClick = onClick,
-        modifier = Modifier
-            .size(44.dp)
-            .clip(CircleShape)
-            .background(
-                if (isFavorite) {
-                    MaterialTheme.colorScheme.primaryContainer
-                } else {
-                    MaterialTheme.colorScheme.surfaceVariant
-                }
-            ),
+        modifier = Modifier.size(44.dp),
     ) {
         Text(
             text = if (isFavorite) "★" else "☆",
             style = MaterialTheme.typography.headlineSmall,
             color = if (isFavorite) {
-                MaterialTheme.colorScheme.onPrimaryContainer
+                FavoriteYellow
             } else {
                 MaterialTheme.colorScheme.onSurfaceVariant
             },
@@ -326,18 +344,45 @@ private fun FavoriteButton(isFavorite: Boolean, onClick: () -> Unit) {
 
 @Composable
 private fun ShareButton(onClick: () -> Unit) {
+    val iconColor = MaterialTheme.colorScheme.tertiary
+
     IconButton(
         onClick = onClick,
-        modifier = Modifier
-            .size(44.dp)
-            .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.tertiaryContainer),
+        modifier = Modifier.size(44.dp),
     ) {
-        Text(
-            text = "↗",
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onTertiaryContainer,
+        ShareIcon(color = iconColor)
+    }
+}
+
+@Composable
+private fun ShareIcon(color: Color, modifier: Modifier = Modifier) {
+    Canvas(modifier = modifier.size(24.dp)) {
+        val strokeWidth = 2.dp.toPx()
+        val radius = 3.2.dp.toPx()
+        val left = androidx.compose.ui.geometry.Offset(size.width * 0.25f, size.height * 0.5f)
+        val topRight = androidx.compose.ui.geometry.Offset(size.width * 0.75f, size.height * 0.25f)
+        val bottomRight = androidx.compose.ui.geometry.Offset(size.width * 0.75f, size.height * 0.75f)
+
+        drawLine(
+            color = color,
+            start = left,
+            end = topRight,
+            strokeWidth = strokeWidth,
         )
+        drawLine(
+            color = color,
+            start = left,
+            end = bottomRight,
+            strokeWidth = strokeWidth,
+        )
+        listOf(left, topRight, bottomRight).forEach { center ->
+            drawCircle(
+                color = color,
+                radius = radius,
+                center = center,
+                style = Stroke(width = strokeWidth),
+            )
+        }
     }
 }
 
@@ -527,118 +572,13 @@ private fun AboutScreen(modifier: Modifier = Modifier) {
     }
 }
 
-private data class DailyWord(
-    val word: String,
-    val partOfSpeech: String,
-    val definitions: List<String>,
-    val ipa: String?,
-    val example: Example?,
-) {
-    val favoriteKey: String
-        get() = "$word|$partOfSpeech"
-}
-
-private data class Example(
-    val text: String,
-    val translation: String,
-)
-
 private enum class AppTab(val label: String) {
     Today("Today"),
     Favorites("Favorites"),
     About("About"),
 }
 
-private const val FAVORITES_PREFS = "favorite_words"
-private const val FAVORITES_KEY = "favorite_keys"
-
-private fun loadWords(context: Context): List<DailyWord> {
-    val json = context.assets.open("words.json").bufferedReader().use { it.readText() }
-    val array = JSONArray(json)
-    return buildList {
-        for (index in 0 until array.length()) {
-            val item = array.getJSONObject(index)
-            val definitionsArray = item.getJSONArray("definitions")
-            val definitions = buildList {
-                for (definitionIndex in 0 until definitionsArray.length()) {
-                    add(definitionsArray.getString(definitionIndex))
-                }
-            }
-            add(
-                DailyWord(
-                    word = item.getString("word"),
-                    partOfSpeech = item.getString("partOfSpeech"),
-                    definitions = definitions,
-                    ipa = item.optString("ipa").takeIf { it.isNotBlank() },
-                    example = item.optJSONObject("example")?.let { example ->
-                        Example(
-                            text = example.getString("text"),
-                            translation = example.getString("translation"),
-                        )
-                    },
-                )
-            )
-        }
-    }
-}
-
-private fun chooseDailyWord(words: List<DailyWord>, dayKey: Int): DailyWord {
-    val mixed = dayKey.toLong() * 1_103_515_245L + 12_345L
-    val index = (mixed % words.size).toInt()
-    return words[index]
-}
-
-private fun todayKey(): Int {
-    val calendar = Calendar.getInstance()
-    val year = calendar.get(Calendar.YEAR)
-    val dayOfYear = calendar.get(Calendar.DAY_OF_YEAR)
-    return year * 1000 + dayOfYear
-}
-
-private fun todayLabel(): String {
-    return SimpleDateFormat("MMMM d", Locale.ENGLISH).format(Calendar.getInstance().time)
-}
-
-private fun loadFavoriteKeys(context: Context): Set<String> {
-    val prefs = context.getSharedPreferences(FAVORITES_PREFS, Context.MODE_PRIVATE)
-    return prefs.getStringSet(FAVORITES_KEY, emptySet()).orEmpty().toSet()
-}
-
-private fun saveFavoriteKeys(context: Context, favoriteKeys: Set<String>) {
-    val prefs = context.getSharedPreferences(FAVORITES_PREFS, Context.MODE_PRIVATE)
-    prefs.edit().putStringSet(FAVORITES_KEY, favoriteKeys).apply()
-}
-
-private fun shareWord(context: Context, dailyWord: DailyWord) {
-    val sendIntent = Intent(Intent.ACTION_SEND).apply {
-        type = "text/plain"
-        putExtra(Intent.EXTRA_SUBJECT, "Finnish Word of the Day: ${dailyWord.word}")
-        putExtra(Intent.EXTRA_TEXT, dailyWord.shareText())
-    }
-    val chooser = Intent.createChooser(sendIntent, "Share word")
-    context.startActivity(chooser)
-}
-
-private fun DailyWord.shareText(): String {
-    return buildString {
-        appendLine("Today's Finnish word: $word")
-        ipa?.let { appendLine(it) }
-        appendLine(partOfSpeech)
-        definitions.forEach { definition ->
-            appendLine("- $definition")
-        }
-        example?.let {
-            appendLine()
-            appendLine("Example:")
-            appendLine(it.text)
-            appendLine(it.translation)
-        }
-    }.trim()
-}
-
-private fun Set<String>.toggle(value: String): Set<String> {
-    return if (value in this) this - value else this + value
-}
+private val FavoriteYellow = Color(0xFFFFC107)
 
 @Preview(showBackground = true)
 @Composable

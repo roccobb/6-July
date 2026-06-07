@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Finnish Word of the Day</string>
+    <string name="widget_description">Shows today\'s Finnish word and quick actions.</string>
+    <string name="widget_empty_body">Open the app to try loading words again.</string>
+    <string name="widget_empty_title">No word today</string>
+    <string name="widget_favorite">Favorite word</string>
+    <string name="widget_share">Share word</string>
 </resources>
