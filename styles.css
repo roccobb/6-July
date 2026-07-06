@@ -164,13 +164,15 @@ h1 {
 }
 
 .word-title {
+  flex: 1 1 auto;
   min-width: 0;
   margin: 0;
-  overflow-wrap: anywhere;
+  overflow: hidden;
   color: var(--primary);
   font-size: clamp(2.1rem, 12vw, 3.4rem);
   font-weight: 780;
   line-height: 0.98;
+  white-space: nowrap;
 }
 
 .word-actions {
@@ -191,16 +193,19 @@ h1 {
 }
 
 .icon-button {
-  display: grid;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 44px;
   height: 44px;
-  place-items: center;
   border: 0;
   border-radius: 50%;
   background: var(--secondary-soft);
   color: var(--muted);
   font-size: 1.45rem;
   font-weight: 750;
+  line-height: 1;
+  padding: 0;
 }
 
 .icon-button.active {
@@ -212,6 +217,24 @@ h1 {
   width: 24px;
   height: 24px;
   display: block;
+}
+
+.favorite-icon {
+  width: 25px;
+  height: 25px;
+  display: block;
+  transform: translateY(-0.5px);
+}
+
+.favorite-icon path {
+  fill: currentColor;
+  stroke: currentColor;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
+.icon-button:not(.active) .favorite-icon path {
+  fill: none;
 }
 
 .share-icon circle {
@@ -348,6 +371,13 @@ h1 {
   }
 
   .word-topline {
+    display: grid;
     gap: 12px;
+  }
+
+  .word-actions {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
   }
 }

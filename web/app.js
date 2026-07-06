@@ -3,6 +3,8 @@ const FAVORITES_KEY = "valkotassu.favoriteWords";
 const TABS = ["today", "favorites", "about"];
 const SWIPE_MIN_DISTANCE = 56;
 const SWIPE_MAX_VERTICAL_DRIFT = 70;
+const WORD_TITLE_MAX_SIZE = 54;
+const WORD_TITLE_MIN_SIZE = 18;
 
 const state = {
   words: [],
@@ -151,7 +153,7 @@ function renderDailyWord() {
       <div class="word-actions">
         <span class="pos-pill">${escapeHtml(word.partOfSpeech)}</span>
         <button class="icon-button ${isFavorite ? "active" : ""}" type="button" data-action="favorite" aria-label="${isFavorite ? "Remove favorite" : "Add favorite"}">
-          ${isFavorite ? "★" : "☆"}
+          ${starIconMarkup(isFavorite)}
         </button>
         <button class="icon-button" type="button" data-action="share" aria-label="Share word">${shareIconMarkup()}</button>
       </div>
@@ -175,6 +177,7 @@ function renderDailyWord() {
   elements.dailyCard.querySelector('[data-action="share"]').addEventListener("click", () => {
     shareWord(word);
   });
+  requestAnimationFrame(fitDailyWordTitle);
 }
 
 function renderFavorites() {
@@ -197,7 +200,7 @@ function renderFavorites() {
         <p class="part">${escapeHtml(word.partOfSpeech)}</p>
         <p>${escapeHtml(word.definitions[0] || "")}</p>
       </div>
-      <button class="icon-button active" type="button" data-key="${escapeHtml(favoriteKey(word))}" aria-label="Remove favorite">★</button>
+      <button class="icon-button active" type="button" data-key="${escapeHtml(favoriteKey(word))}" aria-label="Remove favorite">${starIconMarkup(true)}</button>
     </article>
   `).join("");
 
@@ -299,6 +302,35 @@ function shareIconMarkup() {
   `;
 }
 
+function starIconMarkup(isFavorite) {
+  return `
+    <svg class="favorite-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path
+        d="M12 3.4l2.58 5.23 5.77.84-4.18 4.07.99 5.74L12 16.56l-5.16 2.72.99-5.74-4.18-4.07 5.77-.84L12 3.4z"
+        ${isFavorite ? "" : "fill=\"none\""}
+      ></path>
+    </svg>
+  `;
+}
+
+function fitDailyWordTitle() {
+  const title = elements.dailyCard.querySelector(".word-title");
+
+  if (!title) {
+    return;
+  }
+
+  title.style.fontSize = `${WORD_TITLE_MAX_SIZE}px`;
+
+  for (let size = WORD_TITLE_MAX_SIZE; size >= WORD_TITLE_MIN_SIZE; size -= 1) {
+    title.style.fontSize = `${size}px`;
+
+    if (title.scrollWidth <= title.clientWidth) {
+      return;
+    }
+  }
+}
+
 function escapeHtml(value) {
   return String(value)
     .replaceAll("&", "&amp;")
@@ -331,3 +363,5 @@ function tabFromHash() {
   const tab = window.location.hash.replace("#", "");
   return TABS.includes(tab) ? tab : "today";
 }
+
+window.addEventListener("resize", fitDailyWordTitle);
