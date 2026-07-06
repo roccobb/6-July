@@ -171,7 +171,8 @@ h1 {
   color: var(--primary);
   font-size: clamp(2.1rem, 12vw, 3.4rem);
   font-weight: 780;
-  line-height: 0.98;
+  line-height: 1.08;
+  padding-bottom: 0.06em;
   white-space: nowrap;
 }
 
