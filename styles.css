@@ -105,10 +105,10 @@ h1 {
 .birthday-message {
   position: fixed;
   left: 50%;
-  top: calc(22px + env(safe-area-inset-top));
+  bottom: calc(82px + env(safe-area-inset-bottom));
   z-index: 20;
   max-width: min(calc(100vw - 32px), 420px);
-  transform: translate(-50%, -18px) scale(0.96);
+  transform: translate(-50%, 12px) scale(0.96);
   border: 1px solid rgba(220, 230, 221, 0.9);
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.96);
