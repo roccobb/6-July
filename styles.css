@@ -38,6 +38,7 @@ a {
   min-height: 100vh;
   margin: 0 auto;
   padding: calc(20px + env(safe-area-inset-top)) 20px calc(24px + env(safe-area-inset-bottom));
+  touch-action: pan-y;
 }
 
 .app-header {
@@ -96,6 +97,45 @@ h1 {
 
 .panel.active {
   display: block;
+}
+
+.panel.panel-from-right {
+  animation: panelFromRight 180ms ease-out;
+}
+
+.panel.panel-from-left {
+  animation: panelFromLeft 180ms ease-out;
+}
+
+@keyframes panelFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes panelFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel.panel-from-right,
+  .panel.panel-from-left {
+    animation: none;
+  }
 }
 
 .word-card,

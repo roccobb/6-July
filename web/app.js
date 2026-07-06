@@ -1,14 +1,20 @@
 const WORDS_URL = "app/src/main/assets/words.json";
 const FAVORITES_KEY = "valkotassu.favoriteWords";
+const TABS = ["today", "favorites", "about"];
+const SWIPE_MIN_DISTANCE = 56;
+const SWIPE_MAX_VERTICAL_DRIFT = 70;
 
 const state = {
   words: [],
   dailyWord: null,
   favorites: new Set(),
   selectedTab: tabFromHash(),
+  tabDirection: 0,
+  swipeStart: null,
 };
 
 const elements = {
+  appShell: document.querySelector(".app-shell"),
   dateLabel: document.querySelector("#dateLabel"),
   dailyCard: document.querySelector("#dailyCard"),
   favoritesList: document.querySelector("#favoritesList"),
@@ -26,6 +32,7 @@ async function init() {
   elements.dateLabel.textContent = formatDate(new Date());
   state.favorites = loadFavorites();
   bindTabs();
+  bindSwipeNavigation();
   registerServiceWorker();
 
   try {
@@ -45,11 +52,66 @@ async function init() {
 function bindTabs() {
   elements.tabButtons.forEach((button) => {
     button.addEventListener("click", () => {
-      state.selectedTab = button.dataset.tab;
-      history.replaceState(null, "", `#${state.selectedTab}`);
-      renderTabs();
+      selectTab(button.dataset.tab);
     });
   });
+}
+
+function bindSwipeNavigation() {
+  if (!elements.appShell) {
+    return;
+  }
+
+  elements.appShell.addEventListener("touchstart", (event) => {
+    if (event.touches.length !== 1) {
+      state.swipeStart = null;
+      return;
+    }
+
+    const touch = event.touches[0];
+    state.swipeStart = {
+      x: touch.clientX,
+      y: touch.clientY,
+    };
+  }, { passive: true });
+
+  elements.appShell.addEventListener("touchend", (event) => {
+    if (!state.swipeStart || event.changedTouches.length !== 1) {
+      state.swipeStart = null;
+      return;
+    }
+
+    const touch = event.changedTouches[0];
+    const deltaX = touch.clientX - state.swipeStart.x;
+    const deltaY = touch.clientY - state.swipeStart.y;
+    state.swipeStart = null;
+
+    if (Math.abs(deltaX) < SWIPE_MIN_DISTANCE || Math.abs(deltaY) > SWIPE_MAX_VERTICAL_DRIFT) {
+      return;
+    }
+
+    selectAdjacentTab(deltaX < 0 ? 1 : -1);
+  }, { passive: true });
+}
+
+function selectAdjacentTab(direction) {
+  const currentIndex = TABS.indexOf(state.selectedTab);
+  const nextTab = TABS[currentIndex + direction];
+
+  if (nextTab) {
+    selectTab(nextTab);
+  }
+}
+
+function selectTab(tab) {
+  if (!TABS.includes(tab) || tab === state.selectedTab) {
+    return;
+  }
+
+  state.tabDirection = Math.sign(TABS.indexOf(tab) - TABS.indexOf(state.selectedTab));
+  state.selectedTab = tab;
+  history.replaceState(null, "", `#${state.selectedTab}`);
+  renderTabs();
 }
 
 function render() {
@@ -63,7 +125,13 @@ function renderTabs() {
     button.classList.toggle("active", button.dataset.tab === state.selectedTab);
   });
   Object.entries(elements.panels).forEach(([name, panel]) => {
-    panel.classList.toggle("active", name === state.selectedTab);
+    const isActive = name === state.selectedTab;
+    panel.classList.remove("panel-from-left", "panel-from-right");
+    panel.classList.toggle("active", isActive);
+
+    if (isActive && state.tabDirection !== 0) {
+      panel.classList.add(state.tabDirection > 0 ? "panel-from-right" : "panel-from-left");
+    }
   });
 }
 
@@ -248,5 +316,5 @@ function registerServiceWorker() {
 
 function tabFromHash() {
   const tab = window.location.hash.replace("#", "");
-  return ["today", "favorites", "about"].includes(tab) ? tab : "today";
+  return TABS.includes(tab) ? tab : "today";
 }
