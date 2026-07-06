@@ -42,12 +42,7 @@ a {
 }
 
 .app-header {
-  position: relative;
   padding-top: 8px;
-}
-
-.app-header.birthday-active {
-  padding-right: 54px;
 }
 
 .date-label {
@@ -66,25 +61,27 @@ h1 {
 }
 
 .birthday-button {
-  position: absolute;
-  top: 2px;
-  right: 0;
+  position: fixed;
+  left: 50%;
+  bottom: calc(18px + env(safe-area-inset-bottom));
+  z-index: 18;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  width: 52px;
+  height: 52px;
+  transform: translateX(-50%);
   border: 1px solid rgba(220, 230, 221, 0.9);
   border-radius: 50%;
   background: var(--surface);
   color: var(--primary);
-  box-shadow: 0 8px 22px rgba(22, 39, 28, 0.1);
+  box-shadow: 0 14px 32px rgba(22, 39, 28, 0.18);
   padding: 0;
 }
 
 .cake-icon {
-  width: 25px;
-  height: 25px;
+  width: 29px;
+  height: 29px;
   display: block;
 }
 

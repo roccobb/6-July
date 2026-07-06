@@ -6,6 +6,8 @@ const SWIPE_MAX_VERTICAL_DRIFT = 70;
 const WORD_TITLE_MAX_SIZE = 54;
 const WORD_TITLE_MIN_SIZE = 18;
 const BIRTHDAY_NAME = "Amaya";
+const BIRTHDAY_MESSAGE_MS = 3600;
+let birthdayMessageTimer = null;
 
 const state = {
   words: [],
@@ -329,7 +331,7 @@ function starIconMarkup(isFavorite) {
 }
 
 function setupBirthdaySurprise(date) {
-  if (!elements.appHeader || !isBirthdayDate(date)) {
+  if (!isBirthdayDate(date)) {
     return;
   }
 
@@ -339,8 +341,7 @@ function setupBirthdaySurprise(date) {
   button.setAttribute("aria-label", `Birthday surprise for ${BIRTHDAY_NAME}`);
   button.innerHTML = cakeIconMarkup();
   button.addEventListener("click", showBirthdaySurprise);
-  elements.appHeader.classList.add("birthday-active");
-  elements.appHeader.append(button);
+  document.body.append(button);
 }
 
 function isBirthdayDate(date) {
@@ -360,9 +361,13 @@ function showBirthdaySurprise() {
 
   message.textContent = `Hyvää syntymäpäivää ${BIRTHDAY_NAME}!`;
   message.classList.remove("show");
+  window.clearTimeout(birthdayMessageTimer);
   requestAnimationFrame(() => {
     message.classList.add("show");
   });
+  birthdayMessageTimer = window.setTimeout(() => {
+    message.classList.remove("show");
+  }, BIRTHDAY_MESSAGE_MS);
 
   launchConfetti();
 }
