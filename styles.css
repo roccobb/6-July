@@ -42,7 +42,12 @@ a {
 }
 
 .app-header {
+  position: relative;
   padding-top: 8px;
+}
+
+.app-header.birthday-active {
+  padding-right: 54px;
 }
 
 .date-label {
@@ -58,6 +63,113 @@ h1 {
   font-size: clamp(1.45rem, 8vw, 2rem);
   font-weight: 760;
   line-height: 1.1;
+}
+
+.birthday-button {
+  position: absolute;
+  top: 2px;
+  right: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(220, 230, 221, 0.9);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--primary);
+  box-shadow: 0 8px 22px rgba(22, 39, 28, 0.1);
+  padding: 0;
+}
+
+.cake-icon {
+  width: 25px;
+  height: 25px;
+  display: block;
+}
+
+.cake-fill,
+.cake-flame {
+  fill: currentColor;
+}
+
+.cake-flame {
+  color: #f0b429;
+}
+
+.cake-line {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
+.birthday-message {
+  position: fixed;
+  left: 50%;
+  top: calc(22px + env(safe-area-inset-top));
+  z-index: 20;
+  max-width: min(calc(100vw - 32px), 420px);
+  transform: translate(-50%, -18px) scale(0.96);
+  border: 1px solid rgba(220, 230, 221, 0.9);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 18px 44px rgba(22, 39, 28, 0.18);
+  color: var(--primary);
+  font-size: 1.08rem;
+  font-weight: 780;
+  line-height: 1.25;
+  opacity: 0;
+  padding: 14px 18px;
+  pointer-events: none;
+  text-align: center;
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+
+.birthday-message.show {
+  opacity: 1;
+  transform: translate(-50%, 0) scale(1);
+}
+
+.confetti-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 19;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.confetti-piece {
+  position: absolute;
+  top: -18px;
+  left: var(--x);
+  width: 8px;
+  height: 14px;
+  border-radius: 2px;
+  background: var(--color);
+  opacity: 0.92;
+  transform: translateY(-18px) rotate(0deg);
+  animation: confettiFall var(--duration) var(--delay) cubic-bezier(0.19, 0.72, 0.32, 1) forwards;
+}
+
+.confetti-piece:nth-child(3n) {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.confetti-piece:nth-child(4n) {
+  width: 6px;
+  height: 18px;
+}
+
+@keyframes confettiFall {
+  to {
+    transform: translate(var(--drift), 108vh) rotate(var(--spin));
+  }
 }
 
 .tabs {
@@ -135,6 +247,10 @@ h1 {
   .panel.panel-from-right,
   .panel.panel-from-left {
     animation: none;
+  }
+
+  .confetti-piece {
+    animation-duration: 1ms;
   }
 }
 

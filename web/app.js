@@ -5,6 +5,7 @@ const SWIPE_MIN_DISTANCE = 56;
 const SWIPE_MAX_VERTICAL_DRIFT = 70;
 const WORD_TITLE_MAX_SIZE = 54;
 const WORD_TITLE_MIN_SIZE = 18;
+const BIRTHDAY_NAME = "Amaya";
 
 const state = {
   words: [],
@@ -17,6 +18,7 @@ const state = {
 
 const elements = {
   appShell: document.querySelector(".app-shell"),
+  appHeader: document.querySelector(".app-header"),
   dateLabel: document.querySelector("#dateLabel"),
   dailyCard: document.querySelector("#dailyCard"),
   favoritesList: document.querySelector("#favoritesList"),
@@ -35,6 +37,7 @@ async function init() {
   state.favorites = loadFavorites();
   bindTabs();
   bindSwipeNavigation();
+  setupBirthdaySurprise(new Date());
   registerServiceWorker();
 
   try {
@@ -302,6 +305,18 @@ function shareIconMarkup() {
   `;
 }
 
+function cakeIconMarkup() {
+  return `
+    <svg class="cake-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path class="cake-flame" d="M12 2.8c1 1 1.4 1.8 1.4 2.6a1.4 1.4 0 0 1-2.8 0c0-.8.4-1.6 1.4-2.6z"></path>
+      <path class="cake-line" d="M12 7v3"></path>
+      <path class="cake-fill" d="M6.2 11.2h11.6c1 0 1.8.8 1.8 1.8v2.2H4.4V13c0-1 .8-1.8 1.8-1.8z"></path>
+      <path class="cake-line" d="M4.4 15.2h15.2v4H4.4z"></path>
+      <path class="cake-line" d="M6.4 14c1.2 1 2.4 1 3.6 0s2.4-1 3.6 0 2.4 1 3.6 0"></path>
+    </svg>
+  `;
+}
+
 function starIconMarkup(isFavorite) {
   return `
     <svg class="favorite-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -311,6 +326,76 @@ function starIconMarkup(isFavorite) {
       ></path>
     </svg>
   `;
+}
+
+function setupBirthdaySurprise(date) {
+  if (!elements.appHeader || !isBirthdayDate(date)) {
+    return;
+  }
+
+  const button = document.createElement("button");
+  button.className = "birthday-button";
+  button.type = "button";
+  button.setAttribute("aria-label", `Birthday surprise for ${BIRTHDAY_NAME}`);
+  button.innerHTML = cakeIconMarkup();
+  button.addEventListener("click", showBirthdaySurprise);
+  elements.appHeader.classList.add("birthday-active");
+  elements.appHeader.append(button);
+}
+
+function isBirthdayDate(date) {
+  return date.getMonth() === 6 && date.getDate() === 6;
+}
+
+function showBirthdaySurprise() {
+  let message = document.querySelector(".birthday-message");
+
+  if (!message) {
+    message = document.createElement("div");
+    message.className = "birthday-message";
+    message.setAttribute("role", "status");
+    message.setAttribute("aria-live", "polite");
+    document.body.append(message);
+  }
+
+  message.textContent = `Hyvää syntymäpäivää ${BIRTHDAY_NAME}!`;
+  message.classList.remove("show");
+  requestAnimationFrame(() => {
+    message.classList.add("show");
+  });
+
+  launchConfetti();
+}
+
+function launchConfetti() {
+  const existing = document.querySelector(".confetti-layer");
+
+  if (existing) {
+    existing.remove();
+  }
+
+  const layer = document.createElement("div");
+  layer.className = "confetti-layer";
+  layer.setAttribute("aria-hidden", "true");
+  document.body.append(layer);
+
+  const colors = ["#17633f", "#f0b429", "#e05d5d", "#4f8fd8", "#d76cc4", "#f58f29"];
+
+  for (let index = 0; index < 96; index += 1) {
+    const piece = document.createElement("span");
+    piece.className = "confetti-piece";
+    piece.style.setProperty("--x", `${Math.random() * 100}vw`);
+    piece.style.setProperty("--delay", `${Math.random() * 0.45}s`);
+    piece.style.setProperty("--duration", `${2.5 + Math.random() * 1.7}s`);
+    piece.style.setProperty("--spin", `${360 + Math.random() * 720}deg`);
+    piece.style.setProperty("--drift", `${(Math.random() - 0.5) * 120}px`);
+    piece.style.setProperty("--color", colors[index % colors.length]);
+    layer.append(piece);
+  }
+
+  window.setTimeout(() => {
+    layer.remove();
+  }, 4700);
 }
 
 function fitDailyWordTitle() {
